@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema({
 <<<<<<< HEAD
       refPath:"role"
 =======
-      refPath:role
+      refPath:"role"
 >>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     }
 })
