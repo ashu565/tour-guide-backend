@@ -7,11 +7,11 @@ const LocationSchema = new mongoose.Schema({
   },
   guide: {
     type: ObjectId,
-    ref: Guide
+    ref: "Guide"
   },
-  Hotel: {
+  hotel: {
     type: ObjectId,
-    ref: Hotel
+    ref: "Hotel"
   },
   serviceType: {
     type: String,
@@ -19,7 +19,7 @@ const LocationSchema = new mongoose.Schema({
   },
   service: {
     type: ObjectId,
-    refPath: serviceType
+    refPath: "serviceType"
   },
   Amount: {
     type: Double,
