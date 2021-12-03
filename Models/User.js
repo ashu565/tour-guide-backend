@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const {ObjectId} = mongoose.Schema.Types
+const validator=require('validator');
 const userSchema = new mongoose.Schema({
     firstName:{
         type:String,
@@ -17,7 +18,8 @@ const userSchema = new mongoose.Schema({
     },
     email:{
         type:String,
-        required:true
+        required:true,
+        validate:[validator.isEmail,'Please provide a valid email']
     },
     password:{
         type:String,
@@ -38,7 +40,7 @@ const userSchema = new mongoose.Schema({
 <<<<<<< HEAD
       refPath:"role"
 =======
-      refPath:role
+      refPath:"role"
 >>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     }
 })

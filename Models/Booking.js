@@ -31,7 +31,7 @@ const bookingSchema = new mongoose.Schema({
     },
     hotel:{
       type:ObjectId,
-      ref:Hotel
+      ref:"Hotel"
 >>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     },
     serviceType:{
@@ -51,7 +51,7 @@ const bookingSchema = new mongoose.Schema({
     },
     location:{
       type:ObjectId,
-      ref:Location
+      ref:"Location"
 >>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     }
 },{
