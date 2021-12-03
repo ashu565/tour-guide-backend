@@ -7,19 +7,11 @@ const LocationSchema = new mongoose.Schema({
     },
     guide:{
       type:ObjectId,
-<<<<<<< HEAD
       ref:"Guide"
     },
-    Hotel:{
+    hotel:{
       type:ObjectId,
       ref:"Hotel"
-=======
-      ref:Guide
-    },
-    Hotel:{
-      type:ObjectId,
-      ref:Hotel
->>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     },
     serviceType:{
       type:String,
@@ -27,13 +19,8 @@ const LocationSchema = new mongoose.Schema({
     },
     service:{
       type:ObjectId,
-<<<<<<< HEAD
       refPath:"serviceType"
     },
-=======
-      refPath:serviceType
-    }
->>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     Amount:{
       type:Double,
       required:true

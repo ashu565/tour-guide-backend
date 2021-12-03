@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const {ObjectId} = mongoose.Schema.Types
 const validator=require('validator');
+const bcryptjs = require("bcryptjs");
 const userSchema = new mongoose.Schema({
     firstName:{
         type:String,
@@ -37,13 +38,18 @@ const userSchema = new mongoose.Schema({
     },
     specifics:{
       type:ObjectId,
-<<<<<<< HEAD
       refPath:"role"
-=======
-      refPath:"role"
->>>>>>> b5787c885bbf036ab8a0f204ba17ddeed3135ede
     }
 })
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+  this.password = await bcryptjs.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
+});
 
 const User = mongoose.model("User",userSchema)
 module.exports = User

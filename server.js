@@ -1,5 +1,6 @@
 const dotenv = require('dotenv');
 const mongoose = require('mongoose')
+const authRoute = require("./routes/authRoutes");
 dotenv.config();
 
 const app = require("./app");
@@ -15,6 +16,8 @@ mongoose
     // console.log(con.connection);
     console.log("DB connection success");
   });
+
+app.use("/api/v1/auth", authRoute);
 
 app.listen(port, () => {
   console.log(`app running on port ${port}`);
