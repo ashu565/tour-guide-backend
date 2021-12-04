@@ -2,6 +2,8 @@ const User = require("../Models/User");
 const { getModelOnName } = require("../Models/Helper");
 const jwt = require('jsonwebtoken');
 const AppError = require("../utils/appError");
+const { promisify } = require("util");
+const Email = require("../utils/email");
 
 const debug = (xx) => {
   console.log(xx)
@@ -93,4 +95,39 @@ exports.protect = async (req,res,next) => {
    catch (err) {
        next(err);
    }
-}
+};
+
+
+exports.forgotPassword = async (req,res,next) =>{
+  try {
+      const {email} = req.body;
+      const user = await User.findOne({
+        email:email
+      });
+      if(!user)
+       return next(new AppError("No such User exists"), 400);
+
+       const resetToken = await user.createPasswordResetToken();
+
+       const resetURL = `http://localhost:3000/resetPassword/${resetToken}`;
+       const message = `Forgot your password ? submit a patch reqest with your new password click to ${resetURL}`;
+
+       try {
+           await new Email(user,resetURL).sendPasswordReset();
+           res.status(200).json({
+             status:"success",
+             message: "Token send to mail"
+           });
+            await user.save({ validateBeforeSave: false });
+       }
+       catch {
+           user.passwordResetToken = undefined;
+           user.passwordResetExpires = undefined;
+           await user.save({ validateBeforeSave: false });
+           return next(new AppError("There was an error in sending a mail"), 400);
+       }
+  }
+  catch {
+       next(err);
+  }
+};
