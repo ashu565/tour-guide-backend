@@ -3,25 +3,17 @@ const Guide = require("../Models/Guide");
 const Hotel = require("../Models/Hotel");
 
 
-exports.getModelOnName = async (role, description) => {
+
+exports.getModelOnName = (role) => {
   switch (role) {
     case 'Traveller': {
-      const traveller = await Traveller.create({
-        description
-      });
-      return traveller;
+      return Traveller;
     }
     case 'Guide': {
-      const guide = await Guide.create({
-        description
-      });
-      return guide;
+      return Guide;
     }
     case 'Hotel': {
-      const hotel = await Hotel.create({
-        description
-      });
-      return hotel;
+      return Hotel;
     }
     default: {
       throw new Error("Assertion Failed");
