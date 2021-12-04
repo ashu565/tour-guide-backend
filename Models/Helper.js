@@ -3,6 +3,7 @@ const Guide = require("../Models/Guide");
 const Hotel = require("../Models/Hotel");
 
 
+
 exports.getModelOnName = (role) => {
   switch (role) {
     case 'Traveller': {
