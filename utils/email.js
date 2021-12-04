@@ -10,8 +10,8 @@ module.exports = class Email {
     this.from = `Travel_Service <${process.env.EMAIL_FROM}>`;
   }
 
-  function getMessage(subject) {
-  return {
+   getMessage(subject) {
+   return {
        to: this.to,
        from: this.from,
        subject,
@@ -20,9 +20,9 @@ module.exports = class Email {
        };
   }
 
-  async function sendPasswordReset() {
+  async sendPasswordReset() {
     try {
-        await sendGridMail.send(getMessage("Your password reset token (valid for only 10 minutes)"));
+        await sendGridMail.send(this.getMessage("Your password reset token (valid for only 10 minutes)"));
         }
     catch (error) {
             console.error('Error sending test email');
@@ -30,7 +30,7 @@ module.exports = class Email {
        }
   }
 
-  async function sendWelcome() {
+  async sendWelcome() {
     await this.send("welcome", "Welcome to the Traveller's Family!");
   }
 };
