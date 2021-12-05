@@ -1,96 +1,104 @@
-const User = require("../Models/User");
-const { getModelOnName } = require("../Models/Helper");
 const jwt = require('jsonwebtoken');
-const AppError = require("../utils/appError");
-
-const debug = (xx) => {
-  console.log(xx)
-}
-
+const User = require('../Models/User');
+const AppError = require('../utils/appError');
 
 exports.signup = async (req, res, next) => {
-  try {
-        const { firstName, lastName, contact, email, password, confirmPassword, role, description } = req.body;
-        const Model = await getModelOnName(role);
-        const finalModel=await Model.create({
-          description
-        });
-        specifics = Model._id;
+    try {
+        const { firstName, lastName, mobile, email, password, role } = req.body;
+
+        const checkExistingUser = await User.findOne({ email });
+
+        if (checkExistingUser) {
+            return next(
+                new AppError('User already exist for provided email'),
+                500
+            );
+        }
+
         const user = await User.create({
-          firstName,
-          lastName,
-          contact,
-          email,
-          password,
-          confirmPassword,
-          role,
-          specifics
+            firstName,
+            lastName,
+            mobile,
+            email,
+            password,
+            role,
         });
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '24h',
+        });
+
         user.password = undefined;
-        user.confirmPassword = undefined;
+
         res.status(201).json({
-          status: "success",
-          data: {
+            status: 'success',
+            message: 'Sign Up successful, Welcome',
             user,
             token,
-          },
         });
-  }
-  catch (err) {
-          console.log(err);
-          next(err);
-  }
+    } catch (err) {
+        console.log(err);
+        return next(new AppError('Something went wrong, Sign up failed'), 500);
+    }
 };
 
+exports.login = async (req, res, next) => {
+    try {
+        const { email, password } = req.body;
 
-exports.login = async (req,res,next) => {
-  try {
+        if (!email || !password) {
+            return next(new AppError('Invalid Credentials'));
+        }
 
-       const {email,password} = req.body;
-       if(!email || !password) {
-            return next(new AppError("Invalid Credentials"));
-       }
+        const user = await User.findOne({ email }).select('+password');
 
-       const user = await User.findOne({
-           email: email
-       }).select("+password");
+        if (!user) {
+            return next(
+                new AppError('User does not exist, please Sign up '),
+                400
+            );
+        }
 
-       if(!user || !(await user.correctPassword(password,user.password))){
-             return next(new AppError("Invalid Credentials"), 400);
-       }
+        if (!(await user.correctPassword(password, user.password))) {
+            return next(
+                new AppError('Password not correct for provided email'),
+                400
+            );
+        }
 
-       const token = jwt.sign({id:user._id},process.env.JWT_SECRET);
-       user.password = undefined;
-       user.passwordConfirm = undefined;
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: '24h',
+        });
 
-       res.status(200).json({
-         status: "success",
-         data: {
-           user,
-           token
-         },
-       });
-  }
-  catch (err) {
-       console.log(err);
-  }
+        user.password = undefined;
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Logged In Successfully',
+            user,
+            token,
+        });
+    } catch (err) {
+        console.log(err);
+        return next(new AppError('Something went wrong, Logging fail'), 500);
+    }
 };
 
-exports.protect = async (req,res,next) => {
-   try {
-       const token = req.headers.authorization;
-       if(!token)
-       return next(new AppError("You are not logged in"), 400);
+exports.protect = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization;
+        if (!token) return next(new AppError('You are not logged in'), 400);
 
-       const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        const decoded = await promisify(jwt.verify)(
+            token,
+            process.env.JWT_SECRET
+        );
 
-       const user = await User.findOne({_id: decoded.id});
-       user.password=undefined;
-       req.user=user;
-       next();
-   }
-   catch (err) {
-       next(err);
-   }
-}
+        const user = await User.findOne({ _id: decoded.id });
+        user.password = undefined;
+        req.user = user;
+        next();
+    } catch (err) {
+        next(err);
+    }
+};
