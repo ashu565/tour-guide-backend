@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../Models/User');
 const AppError = require('../utils/appError');
-const { promisify } = require("util");
-const Email = require("../utils/email");
-const crypto = require("crypto");
+const { promisify } = require('util');
+const Email = require('../utils/email');
+const crypto = require('crypto');
 
 exports.signup = async (req, res, next) => {
     try {
@@ -13,8 +13,7 @@ exports.signup = async (req, res, next) => {
 
         if (checkExistingUser) {
             return next(
-                new AppError('User already exist for provided email'),
-                500
+                new AppError('User already exist for provided email', 500)
             );
         }
 
@@ -41,7 +40,7 @@ exports.signup = async (req, res, next) => {
         });
     } catch (err) {
         console.log(err);
-        return next(new AppError('Something went wrong, Sign up failed'), 500);
+        return next(new AppError('Something went wrong, Sign up failed', 500));
     }
 };
 
@@ -50,22 +49,20 @@ exports.login = async (req, res, next) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return next(new AppError('Invalid Credentials'));
+            return next(new AppError('Invalid Credentials', 401));
         }
 
         const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
             return next(
-                new AppError('User does not exist, please Sign up '),
-                400
+                new AppError('User does not exist, please Sign up ', 404)
             );
         }
 
         if (!(await user.correctPassword(password, user.password))) {
             return next(
-                new AppError('Password not correct for provided email'),
-                400
+                new AppError('Password not correct for provided email', 401)
             );
         }
 
@@ -83,120 +80,132 @@ exports.login = async (req, res, next) => {
         });
     } catch (err) {
         console.log(err);
-        return next(new AppError('Something went wrong, Logging fail'), 500);
+        return next(new AppError('Something went wrong, Logging fail', 500));
     }
 };
 
-exports.protect = async (req,res,next) => {
-   try {
-       const token = req.headers.authorization;
-       if(!token)
-       return next(new AppError("You are not logged in"), 400);
+exports.protect = async (req, res, next) => {
+    try {
+        const token = req.headers.authorization;
+        if (!token) return next(new AppError('You are not logged in', 401));
 
-       const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
+        const decoded = await promisify(jwt.verify)(
+            token,
+            process.env.JWT_SECRET
+        );
 
-       const user = await User.findOne({_id: decoded.id});
-       user.password=undefined;
-       req.user=user;
-       next();
-   }
-   catch (err) {
-       next(err);
-   }
+        const user = await User.findOne({ _id: decoded.id });
+        user.password = undefined;
+        req.user = user;
+        next();
+    } catch (err) {
+        next(
+            new AppError('Something went wrong, your do not have access', 403)
+        );
+    }
 };
 
+exports.forgotPassword = async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
 
-exports.forgotPassword = async (req,res,next) =>{
-  try {
-      const {email} = req.body;
-      const user = await User.findOne({
-        email:email
-      });
-      if(!user)
-       return next(new AppError("No such User exists"), 400);
+        if (!user) {
+            return next(new AppError('No such User exists', 404));
+        }
 
-       const resetToken = await user.createPasswordResetToken();
+        const resetToken = await user.createPasswordResetToken();
 
-       const resetURL = `http://localhost:3000/resetPassword/${resetToken}`;
-       const message = `Forgot your password ? submit a patch reqest with your new password click to ${resetURL}`;
+        const resetURL = `${process.env.FRONTEND_URL_DEV}/auth/resetPassword/${resetToken}`;
+        const message = `Forgot your password ? submit a patch reqest with your new password click to ${resetURL}`;
 
-       try {
-           await new Email(user,resetURL).sendPasswordReset();
-           res.status(200).json({
-             status:"success",
-             message: "Token send to mail"
-           });
+        try {
+            await new Email(user, resetURL).sendPasswordReset();
+            res.status(200).json({
+                status: 'success',
+                message: 'Reset token sent, please check your email',
+            });
+
             await user.save({ validateBeforeSave: false });
-       }
-       catch {
-           user.passwordResetToken = undefined;
-           user.passwordResetExpires = undefined;
-           await user.save({ validateBeforeSave: false });
-           return next(new AppError("There was an error in sending a mail"), 400);
-       }
-  }
-  catch {
-       next(err);
-  }
+        } catch {
+            user.passwordResetToken = undefined;
+            user.passwordResetExpires = undefined;
+            await user.save({ validateBeforeSave: false });
+
+            return next(
+                new AppError('There was an error in sending a mail', 500)
+            );
+        }
+    } catch {
+        next(err);
+    }
 };
 
-exports.resetPassword = async (req,res,next) => {
-  try {
-      const hashedToken = crypto
-      .createHash("sha256")
-      .update(req.params.token)
-      .digest("hex");
+exports.resetPassword = async (req, res, next) => {
+    try {
+        const hashedToken = crypto
+            .createHash('sha256')
+            .update(req.params.token)
+            .digest('hex');
 
-      const user = await User.findOne({
-        passwordResetToken: hashedToken,
-        passwordResetExpires: {$gt: Date.now()}
-      });
-      if(!user)
-      return next(new AppError("Token Expired"),400);
-      const {password, confirmPassword} = req.body;
+        const user = await User.findOne({
+            passwordResetToken: hashedToken,
+            passwordResetExpires: { $gt: Date.now() },
+        });
 
-      if(password !== confirmPassword)
-        return next(new AppError("Password do not match"));
+        if (!user) return next(new AppError('Token Expired', 401));
 
-        user.password=password;
-        user.confirmPassword=confirmPassword;
+        const { password, confirmPassword } = req.body;
+
+        if (password !== confirmPassword)
+            return next(new AppError('Password do not match'));
+
+        user.password = password;
+        user.confirmPassword = confirmPassword;
         user.passwordResetToken = undefined;
         user.passwordResetExpires = undefined;
+
         await user.save();
 
         res.status(200).json({
-          status:"success"
+            status: 'success',
+            message: 'Password reset successfully',
         });
-     }
-     catch (err) {
-       next(err);
-     }
+    } catch (err) {
+        next(
+            new AppError('Something went wrong, Could not reset password', 500)
+        );
+    }
 };
 
-exports.updatePassword = async (req,res,next) => {
-  try {
-      const user = await User.findById(req.user._id).select("+password");
-      if(! (await user.correctPassword(user.password,req.body.currentPassword)))
-      return next(new AppError("Password do not match"),400);
+exports.updatePassword = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user._id).select('+password');
+        if (
+            !(await user.correctPassword(
+                user.password,
+                req.body.currentPassword
+            ))
+        )
+            return next(new AppError('Password do not match'), 400);
 
-      const {newPassword, newConfirmPassword} = req.body;
-      if(newPassword !== newConfirmPassword)
-      return next(new AppError("Password do not match"),400);
+        const { newPassword, newConfirmPassword } = req.body;
+        if (newPassword !== newConfirmPassword)
+            return next(new AppError('Password do not match'), 400);
 
-      user.password = newPassword;
-      user.confirmPassword = newConfirmPassword;
+        user.password = newPassword;
+        user.confirmPassword = newConfirmPassword;
 
-      await user.save({validateBeforeSave: false, new: true});
+        await user.save({ validateBeforeSave: false, new: true });
 
-      user.password = undefined;
-      user.confirmPassword = undefined;
+        user.password = undefined;
+        user.confirmPassword = undefined;
 
-      res.status(200).json({
-        status: "success",
-        data: null
-      });
-  }
-  catch {
-       next(err);
-  }
+        res.status(200).json({
+            status: 'success',
+            data: null,
+        });
+    } catch {
+        next(err);
+    }
 };
