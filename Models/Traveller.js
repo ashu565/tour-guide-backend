@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 const {ObjectId} = mongoose.Schema.Types
 const travellerSchema = new mongoose.Schema({
+    userInformation: {
+      type: ObjectId,
+      ref: "User"
+    },
     description:{
         type:String
     },

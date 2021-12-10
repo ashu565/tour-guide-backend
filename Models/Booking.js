@@ -1,10 +1,17 @@
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Schema.Types
 const bookingSchema = new mongoose.Schema({
-  userInformation: {
+  location:{
+    type: ObjectId,
+    ref: "location"
+  },
+  user: {
     type: ObjectId,
     ref: 'User',
-    required: true
+  },
+  paid: {
+    type: Boolean,
+    default: true
   },
   startingDate: {
     type: Date,
@@ -14,30 +21,6 @@ const bookingSchema = new mongoose.Schema({
     type: Date,
     required: true
   },
-  paymentAmount: {
-    type: Double,
-    required: true
-  },
-  guide: {
-    type: ObjectId,
-    ref: 'Guide'
-  },
-  hotel: {
-    type: ObjectId,
-    ref: "Hotel"
-  },
-  serviceType: {
-    type: String,
-    required: true,
-  },
-  service: {
-    type: ObjectId,
-    refPath: 'serviceType'
-  },
-  location: {
-    type: ObjectId,
-    ref: "Location"
-  }
 }, {
   timestamps: true
 })
