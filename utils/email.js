@@ -16,9 +16,9 @@ module.exports = class Email {
             to: this.to,
             from: this.from,
             subject,
-            html: `Hello ${this.firstName}, <p>You're almost ready to reset your password! </p>            
+            html: `Hello ${this.firstName}, <p>You're almost ready to reset your password! </p>
             <h4>Click on the link below to reset your password.</h4>
-            ${this.url} 
+            ${this.url}
             `,
         };
     }
