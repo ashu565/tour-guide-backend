@@ -8,7 +8,6 @@ const guideSchema = new mongoose.Schema({
     pic:String,
     description:{
         type:String,
-        required:true
     },
     location: [{
       type:ObjectId,

@@ -7,12 +7,10 @@ const userSchema = new mongoose.Schema({
     firstName: {
         type: String,
         required: true,
-        index: true,
     },
     lastName: {
         type: String,
         required: true,
-        index: true,
     },
     mobile: {
         type: String,
@@ -21,7 +19,6 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true,
         validate: [validator.isEmail, 'Please provide a valid email'],
     },
     password: {

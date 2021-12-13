@@ -1,9 +1,9 @@
 const mongoose = require('mongoose')
 const { ObjectId } = mongoose.Schema.Types
 const bookingSchema = new mongoose.Schema({
-  location:{
+  Hotel:{
     type: ObjectId,
-    ref: "location"
+    ref: "Hotel"
   },
   user: {
     type: ObjectId,

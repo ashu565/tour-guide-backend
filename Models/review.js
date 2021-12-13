@@ -16,10 +16,10 @@ const reviewSchema = new mongoose.Schema(
       type: Date,
       default: Date.now()
     },
-    location: {
+    Hotel: {
       type: ObjectId,
-      ref: 'Location',
-      required: [true, 'Review must belong to a tour.']
+      ref: 'Hotel',
+      required: [true, 'Review must belong to a hotel.']
     },
     user: {
       type: ObjectId,

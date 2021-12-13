@@ -1,21 +1,63 @@
 const mongoose = require('mongoose')
-const {ObjectId} = mongoose.Schema.Types
+const { ObjectId } = mongoose.Schema.Types
 const hotelSchema = new mongoose.Schema({
-    userInformation: {
-       type: ObjectId,
-       ref: "User"
+  hotelName: {
+      type: String,
+      required: [true, 'A hotel must have a name'],
+      trim: true,
+      maxlength: [40, 'A hotel name must have less or equal then 40 characters'],
+      minlength: [3, 'A hotel name must have more or equal then 3 characters'],
+      sparse:true
+      // validate: [validator.isAlpha, 'Tour name must only contain characters']
     },
-    photo:String,
-    description:{
-        type:String,
-        required:true
+  price: {
+     type: Number,
+     required: [true, 'A hotel must have a price']
+   },
+   imageCover: {
+      type: String,
+      sparse:true
     },
-    location: [{
-      type:ObjectId,
-      ref: "location"
-    }]
+    images: [{
+      type:String,
+      sparse:true
+    }],
+    hotelManager: {
+      type: ObjectId,
+      ref: "HotelManager"
+    },
+    bed: {
+      type: Number,
+      required: true
+    },
+    bathroom: {
+      type: Number,
+      required: true
+    },
+    description: {
+      type: String,
+      required: true
+    },
+    locations: {
+         type: {
+           type: String,
+           default: 'Point',
+           enum: ['Point']
+         },
+         coordinates: [Number],
+         address: String,
+         description: String,
+       },
+     bookingHistory:[{
+         type:ObjectId,
+         ref:"Booking",
+     }],
+     currentBooking:[{
+         type:ObjectId,
+         ref:"Booking",
+     }]
 })
 
-const Hotel = mongoose.model("Hotel",hotelSchema)
+const Hotel = mongoose.model("Hotel", hotelSchema)
 
 module.exports = Hotel
