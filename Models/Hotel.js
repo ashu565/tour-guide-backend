@@ -55,7 +55,7 @@ const hotelSchema = new mongoose.Schema({
      currentBooking:[{
          type:ObjectId,
          ref:"Booking",
-     }]
+     }],
 })
 
 const Hotel = mongoose.model("Hotel", hotelSchema)

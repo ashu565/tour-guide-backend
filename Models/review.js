@@ -16,7 +16,7 @@ const reviewSchema = new mongoose.Schema(
       type: Date,
       default: Date.now()
     },
-    Hotel: {
+    hotel: {
       type: ObjectId,
       ref: 'Hotel',
       required: [true, 'Review must belong to a hotel.']

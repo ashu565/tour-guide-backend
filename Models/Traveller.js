@@ -11,7 +11,7 @@ const travellerSchema = new mongoose.Schema({
     currentBookings:[{
       type:ObjectId,
       ref:"Booking",
-    }]
+    }],
 },)
 
 const Traveller = mongoose.model("Traveller",travellerSchema)
