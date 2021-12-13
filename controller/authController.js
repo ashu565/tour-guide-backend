@@ -4,6 +4,7 @@ const AppError = require('../utils/appError');
 const { promisify } = require('util');
 const Email = require('../utils/email');
 const crypto = require('crypto');
+const helper = require('../Models/Helper')
 
 exports.signup = async (req, res, next) => {
     try {
@@ -16,7 +17,8 @@ exports.signup = async (req, res, next) => {
                 new AppError('User already exist for provided email', 500)
             );
         }
-
+        const Model = helper.getModelOnName(role);
+        const roleModel = await Model.create({});
         const user = await User.create({
             firstName,
             lastName,
@@ -24,6 +26,7 @@ exports.signup = async (req, res, next) => {
             email,
             password,
             role,
+            specifics: roleModel._id
         });
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -86,7 +89,7 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
     try {
-        const token = req.headers.authorization;
+        const token = req.headers.authorization.split(' ')[1];
         if (!token) return next(new AppError('You are not logged in', 401));
 
         const decoded = await promisify(jwt.verify)(
@@ -100,7 +103,7 @@ exports.protect = async (req, res, next) => {
         next();
     } catch (err) {
         next(
-            new AppError('Something went wrong, your do not have access', 403)
+            new AppError('Something went wrong, you do not have access', 403)
         );
     }
 };

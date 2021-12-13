@@ -7,12 +7,10 @@ const travellerSchema = new mongoose.Schema({
     bookingHistory:[{
         type:ObjectId,
         ref:"Booking",
-        required:true
     }],
     currentBookings:[{
       type:ObjectId,
       ref:"Booking",
-      required:true
     }]
 },)
 

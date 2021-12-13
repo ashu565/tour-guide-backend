@@ -1,6 +1,6 @@
 const Traveller = require("../Models/Traveller");
 const Guide = require("../Models/Guide");
-const Hotel = require("../Models/Hotel");
+const HotelManager = require("../Models/HotelManager");
 
 
 
@@ -13,7 +13,7 @@ exports.getModelOnName = (role) => {
       return Guide;
     }
     case 'Hotel': {
-      return Hotel;
+      return HotelManager;
     }
     default: {
       throw new Error("Assertion Failed");

@@ -1,15 +1,17 @@
 const mongoose = require('mongoose')
 const {ObjectId} = mongoose.Schema.Types
 const guideSchema = new mongoose.Schema({
-    pic:[String],
+    userInformation: {
+       type: ObjectId,
+       ref: "User"
+    },
+    pic:String,
     description:{
         type:String,
-        required:true
     },
-    bookingHistory:[{
-        type:ObjectId,
-        ref:"Booking",
-        required:true
+    location: [{
+      type:ObjectId,
+      ref: "location"
     }]
 },)
 
