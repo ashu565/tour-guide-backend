@@ -5,7 +5,7 @@ const authController = require('../controller/authController');
 const bookingController = require('../controller/bookingController')
 
 
-router.post('/createBooking/:id', authController.protect, bookingController.createBooking);
-router.post('/confirmBooking', authController.protect, bookingController.confirmBooking);
+router.post('/createBooking/:id',authController.protect,bookingController.createBooking);
+router.post('/confirmBooking/:id',authController.protect,bookingController.confirmBooking);
 
 module.exports = router;

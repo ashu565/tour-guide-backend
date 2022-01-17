@@ -17,13 +17,13 @@ exports.createHotel = async (req,res,next) => {
             price,
             imageCover,
             images,
-            hotelManager: re.user.specifics,
+            hotelManager: req.user.specifics,
             bed,
             bathroom,
             description,
             locations
           })
-
+          console.log(hotel);
           await HotelManager.findByIdAndUpdate(req.user.specifics,
           {
                $push: {hotel : hotel._id }

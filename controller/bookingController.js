@@ -13,34 +13,26 @@ exports.createBooking = async(req,res,next) => {
            key_secret: process.env.RAZORPAY_SECRET
        });
 
-       const {numberOfRooms, numberOfDays, amount} = req.body;
-
+       const {numberOfRooms, numberOfDays} = req.body;
+       console.log(numberOfRooms,numberOfDays)
+       const rooms = parseInt(numberOfRooms);
+       const days = parseInt(numberOfDays);
        const hotel = await Hotel.findById(req.params.id);
-       const totalPriceToBePaid = numberOfRooms*numberOfDays*hotel.price;
-        console.log(amount, hotel.price);
-       if(amount !== totalPriceToBePaid)
-       {
-           return next(new AppError("Transaction not legit!, please try again"),500);
-       }
-
+       const amount = rooms*days*hotel.price;
+       console.log(amount);
        const options = {
-         amount: amount * 100,
+         amount: amount*100,
          currency: "INR",
          receipt: uuidv4()
        };
-
        const order = await instance.orders.create(options);
-
        if(!order)
        {
            return next(new AppError("Something went wrong,Please try again"));
        }
 
        res.status(200).json({
-         status: "success",
-         data: {
            order
-         }
        });
   }
   catch(error) {
@@ -69,7 +61,7 @@ exports.confirmBooking = async(req,res,next) => {
       const shasum = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET);
       shasum.update(`${orderCreationId}|${razorpayPaymentId}`);
       const digest = shasum.digest('hex');
-
+      console.log(digest,razorpaySignature);
       if (digest !== razorpaySignature) {
         return next(new AppError('Transaction not legit!, please try again later'),400);
       }

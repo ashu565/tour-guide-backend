@@ -47,16 +47,10 @@ const hotelSchema = new mongoose.Schema({
          coordinates: [Number],
          address: String,
          description: String,
-       },
-     bookingHistory:[{
-         type:ObjectId,
-         ref:"Booking",
-     }],
-     currentBooking:[{
-         type:ObjectId,
-         ref:"Booking",
-     }],
+       }
 })
+
+hotelSchema.index({ locations: '2dsphere' });
 
 const Hotel = mongoose.model("Hotel", hotelSchema)
 
