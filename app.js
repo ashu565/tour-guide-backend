@@ -18,6 +18,8 @@ app.use(cors());
 app.use('/api/v1/auth', require('./routes/authRoutes'));
 app.use('/api/v1/hotelManager', require('./routes/hotelManagerRoutes'));
 app.use('/api/v1/traveller', require('./routes/travellerRoutes'));
+app.use('/api/v1/booking', require('./routes/bookingRoutes'));
+app.use('/api/v1/hotel', require('./routes/hotelRoutes'));
 app.all('*', (req, res, next) => {
     next(new AppError(`Can not find ${req.originalUrl} on this server`, 404));
 });

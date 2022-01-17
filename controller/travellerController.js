@@ -129,3 +129,34 @@ exports.getAllReviews = async(req,res,next) => {
       return next(new AppError('Something went wrong, Could not retrieve all Reviews', 500));
   }
 }
+
+exports.getTravellerCurrentBooking = async(req,res,next) => {
+  try {
+      const user = await User.findById(req.params.id);
+      const bookings = await Booking.find({"user": req.params.id, "endingDate": {"$gte" : new Date()}});
+      res.status(200).json({
+        status:"Success",
+        data: bookings
+      });
+
+  } catch(err) {
+    console.log(err);
+    return next(new AppError('Something went wrong, Could not find Your Current Bookings', 500));
+  }
+}
+
+
+exports.getTravellerPastBooking = async(req,res,next) => {
+  try {
+      const user = await User.findById(req.params.id);
+      const bookings = await Booking.find({"user": req.params.id, "endingDate": {"$lt" : new Date()}});
+      res.status(200).json({
+        status:"Success",
+        data: bookings
+      });
+
+  } catch(err) {
+    console.log(err);
+    return next(new AppError('Something went wrong, Could not find Your Past Bookings', 500));
+  }
+}

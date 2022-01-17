@@ -8,4 +8,6 @@ router.post("/createHotelReview/:id", authController.protect, travellerControlle
 router.post("/editHotelReview/:id", authController.protect, travellerController.editHotelReview);
 router.post("/deleteHotelReview/:id", authController.protect, travellerController.deleteHotelReview);
 router.get("/getAllReviews", authController.protect, travellerController.getAllReviews);
+router.get("/getTravellerPastBooking", authController.protect, travellerController.getTravellerPastBooking);
+router.get("/getTravellerCurrentBooking", authController.protect, travellerController.getTravellerCurrentBooking);
 module.exports = router;
