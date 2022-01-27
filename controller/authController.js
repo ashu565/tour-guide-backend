@@ -89,8 +89,10 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
     try {
+        if (req.method === 'OPTIONS') {
+            return next(); // to allow options request to continue.
+        }
         let token;
-        console.log('token header', req.headers);
         if (
             req.headers.authorization &&
             req.headers.authorization.startsWith('Bearer')
@@ -98,7 +100,6 @@ exports.protect = async (req, res, next) => {
             token = req.headers.authorization.split(' ')[1];
         }
         if (!token) return next(new AppError('You are not logged in', 401));
-        console.log('errrrrrrrrrrrrrr');
 
         const decoded = await promisify(jwt.verify)(
             token,

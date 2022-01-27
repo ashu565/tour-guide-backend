@@ -20,20 +20,11 @@ router.get(
 );
 router.get('/getAllHotels', hotelController.getAllHotels);
 router.get('/getHotelReviews/:id', hotelController.getHotelReviews);
+
 router.get(
-    '/getAllBooking',
+    '/getUserBookingList',
     authController.protect,
-    hotelController.getAllBooking
-);
-router.get(
-    '/getPastBooking',
-    authController.protect,
-    hotelController.getPastBooking
-);
-router.get(
-    '/getFutureBooking',
-    authController.protect,
-    hotelController.getFutureBooking
+    hotelController.getUserBookingList
 );
 
 module.exports = router;

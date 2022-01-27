@@ -160,6 +160,71 @@ exports.getAllHotels = async (req, res, next) => {
     }
 };
 
+exports.getUserBookingList = async (req, res) => {
+    const { past, future } = req.query;
+
+    try {
+        const bookings = await Booking.aggregate([
+            ...(past
+                ? [
+                      {
+                          $match: {
+                              startingDate: { $lt: new Date().toISOString() },
+                          },
+                      },
+                  ]
+                : []),
+            ...(future
+                ? [
+                      {
+                          $match: {
+                              startingDate: { $gte: new Date().toISOString() },
+                          },
+                      },
+                  ]
+                : []),
+            {
+                $lookup: {
+                    from: 'users',
+                    localField: 'user',
+                    foreignField: '_id',
+                    as: 'user',
+                },
+            },
+            { $unwind: { path: '$user' } },
+            {
+                $lookup: {
+                    from: 'hotels',
+                    localField: 'hotel',
+                    foreignField: '_id',
+                    as: 'hotel',
+                },
+            },
+            { $unwind: { path: '$hotel' } },
+            { $match: { 'hotel.hotelManager': req.user._id } },
+            {
+                $project: {
+                    id: '$_id',
+                    startingDate: 1,
+                    endingDate: 1,
+                    userFName: '$user.firstName',
+                    userLName: '$user.lastName',
+                    hotelName: '$hotel.hotelName',
+                    price: '$hotel.price',
+                },
+            },
+        ]);
+
+        res.status(200).json(bookings);
+    } catch (e) {
+        console.log(e, '=================');
+        return new AppError(
+            'Something went wrong, Please try again later',
+            500
+        );
+    }
+};
+
 exports.getHotelReviews = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page);
