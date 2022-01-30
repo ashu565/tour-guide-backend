@@ -21,7 +21,9 @@ app.use('/api/v1/traveller', require('./routes/travellerRoutes'));
 app.use('/api/v1/booking', require('./routes/bookingRoutes'));
 app.use('/api/v1/hotel', require('./routes/hotelRoutes'));
 app.all('*', (req, res, next) => {
-    next(new AppError(`Can not find ${req.originalUrl} on this server`, 404));
+    return next(
+        new AppError(`Can not find ${req.originalUrl} on this server`, 404)
+    );
 });
 
 app.use(ErrorMiddleware);
