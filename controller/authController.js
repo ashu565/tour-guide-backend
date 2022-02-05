@@ -6,28 +6,6 @@ const Email = require("../utils/email");
 const crypto = require("crypto");
 const helper = require("../Models/Helper");
 
-exports.getMe = async (req, res, next) => {
-  req.params.id = req.user.id;
-  next();
-};
-
-exports.getUser = async (req, res, next) => {
-  try {
-    const user = User.findById(req.params.id);
-
-    if (!user) {
-      return next(new AppError("No User found with this ID!"));
-    }
-
-    res.status(200).json({
-      status: "success",
-      user,
-    });
-  } catch (err) {
-    naxt(err);
-  }
-};
-
 exports.signup = async (req, res, next) => {
   try {
     const { firstName, lastName, mobile, email, password, role } = req.body;
@@ -37,9 +15,7 @@ exports.signup = async (req, res, next) => {
     if (checkExistingUser) {
       return next(new AppError("User already exist for provided email", 500));
     }
-    console.log("signup before");
     const Model = helper.getModelOnName(role);
-    console.log(Model);
     const roleModel = await Model.create({});
     const user = await User.create({
       firstName,
@@ -107,7 +83,16 @@ exports.login = async (req, res, next) => {
 
 exports.protect = async (req, res, next) => {
   try {
-    const token = req.headers.authorization.split(" ")[1];
+    if (req.method === "OPTIONS") {
+      return next(); // to allow options request to continue.
+    }
+    let token;
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
     if (!token) return next(new AppError("You are not logged in", 401));
 
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
@@ -117,7 +102,10 @@ exports.protect = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
-    next(new AppError("Something went wrong, you do not have access", 403));
+    console.log(err);
+    return next(
+      new AppError("Something went wrong, you do not have access", 403)
+    );
   }
 };
 
@@ -197,7 +185,7 @@ exports.updatePassword = async (req, res, next) => {
       return next(new AppError("Password do not match"), 400);
 
     const { newPassword, newConfirmPassword } = req.body;
- 
+
     if (newPassword !== newConfirmPassword)
       return next(new AppError("Password do not match"), 400);
 
