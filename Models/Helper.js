@@ -5,6 +5,7 @@ const HotelManager = require("../Models/HotelManager");
 
 
 exports.getModelOnName = (role) => {
+  console.log("role: ", role)
   switch (role) {
     case 'Traveller': {
       return Traveller;
