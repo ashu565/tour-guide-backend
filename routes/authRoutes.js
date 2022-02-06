@@ -17,11 +17,11 @@ router.patch(
   authController.updatePassword
 );
 
-router.get(
-  "/getMe",
-  authController.protect,
-  authController.getMe,
-  authController.getUser
-);
+// router.get(
+//   "/getMe",
+//   authController.protect,
+//   authController.getMe,
+//   authController.getUser
+// );
 
 module.exports = router;
