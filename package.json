@@ -23,9 +23,6 @@
     "uuid": "^3.4.0",
     "validator": "^13.7.0"
   },
-  "engines": {
-    "node": "14.17.4"
-  },
   "author": "",
   "bugs": {
     "url": "https://github.com/ashu565/tour-guide-backend/issues"
